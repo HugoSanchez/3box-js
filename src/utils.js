@@ -2,11 +2,7 @@ const XMLHttpRequest = (typeof window !== 'undefined') ? window.XMLHttpRequest :
 
 module.exports = {
   openBoxConsent: (fromAddress, web3provider) => {
-    const text = "This dApp wants to access your 3Box, to:\n"+
-            "* store public and private data about you\n"+
-            "* read public and private data about you\n"+
-            "* remove private data about you\n\n"+
-            "You are always in control of your data. Create your public profile at https://my.3Box.io";
+    const text = "This app requests to view and update your 3Box profile.";
     var msg = '0x' + Buffer.from(text, 'utf8').toString('hex')
     var params = [msg, fromAddress]
     var method = 'personal_sign'
