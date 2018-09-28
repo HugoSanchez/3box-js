@@ -184,12 +184,12 @@ class ThreeBox {
     return threeBox
   }
 
-  async _publishRootStore (odbAddress) {
+  async _publishRootStore (rootStoreAddress) {
     // Sign rootStoreAddress
-    const hashToken = await this._muportDID.signJWT({ odbAddress })
-    // Store odbAddress on 3box-address-server
+    const hashToken = await this._muportDID.signJWT({ rootStoreAddress })
+    // Store rootStoreAddress on 3box-address-server
     try {
-      await utils.httpRequest(this._serverUrl + '/odbAddress', 'POST', { hash_token: hashToken })
+      await utils.httpRequest(this._serverUrl + '/rootStoreAddress', 'POST', { hash_token: hashToken })
     } catch (err) {
       throw new Error(err)
     }
@@ -256,10 +256,12 @@ async function getRootStoreAddress (serverUrl, identifier) {
   return new Promise(async (resolve, reject) => {
     try {
       // read orbitdb root store address from the 3box-address-server
-      const res = await utils.httpRequest(serverUrl + '/odbAddress/' + identifier, 'GET')
-      resolve(res.data.odbAddress)
+      const res = await utils.httpRequest(serverUrl + '/rootStoreAddress/' + identifier, 'GET')
+      console.log('res', res)
+      resolve(res.data.rootStoreAddress)
     } catch (err) {
-      if (JSON.parse(err).message === 'odbAddress not found') {
+      console.log('err', err)
+      if (JSON.parse(err).message === 'root store address not found') {
         resolve(null)
       }
       reject(err)

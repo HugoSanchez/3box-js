@@ -11,7 +11,7 @@ jest.mock('muport-core', () => {
     return {
       serializeState: () => serialized,
       getDid: () => did,
-      signJWT: ({ odbAddress }) => 'veryJWT,' + odbAddress + ',' + did,
+      signJWT: ({ rootStoreAddress }) => 'veryJWT,' + rootStoreAddress + ',' + did,
       getDidDocument: () => { return { managementKey } }
     }
   }
@@ -49,7 +49,7 @@ jest.mock('../utils', () => {
       const lastPart = split[split.length - 1]
       let x, hash, did
       switch (lastPart) {
-        case 'odbAddress': // put odbAddress
+        case 'rootStoreAddress': // put rootStoreAddress
           [x, hash, did] = payload.hash_token.split(',')
           addressMap[did] = hash
           return { status: 'success', data: { hash } }
@@ -59,13 +59,13 @@ jest.mock('../utils', () => {
           linkmap[address] = did
           return { status: 'success', data: { did, address } }
           break
-        default: // default is GET odbAddress
+        default: // default is GET rootStoreAddress
           if (addressMap[lastPart]) {
-            return { status: 'success', data: { odbAddress: addressMap[lastPart] } }
+            return { status: 'success', data: { rootStoreAddress: addressMap[lastPart] } }
           } else if (addressMap[linkmap[lastPart]]) {
-            return { status: 'success', data: { odbAddress: addressMap[linkmap[lastPart]] } }
+            return { status: 'success', data: { rootStoreAddress: addressMap[linkmap[lastPart]] } }
           } else {
-            throw '{"status": "error", "message": "odbAddress not found"}'
+            throw '{"status": "error", "message": "root store address not found"}'
           }
       }
     }),
@@ -130,8 +130,8 @@ describe('3Box', () => {
     expect(mockedUtils.openBoxConsent).toHaveBeenCalledTimes(1)
     expect(mockedUtils.openBoxConsent).toHaveBeenCalledWith(addr, prov)
     expect(mockedUtils.httpRequest).toHaveBeenCalledTimes(2)
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress/did:muport:Qmsdfp98yw4t7', 'GET')
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress', 'POST', {
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress/did:muport:Qmsdfp98yw4t7', 'GET')
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress', 'POST', {
       hash_token: 'veryJWT,/orbitdb/QmRxUAGk62v7NjUkzvcqwYkBqF3zHb8tfhfW6T3MateGje/b932fe7ab.root,did:muport:Qmsdfp98yw4t7'
     })
     expect(box.profileStore._sync).toHaveBeenCalledTimes(1)
@@ -145,7 +145,7 @@ describe('3Box', () => {
     box = await ThreeBox.openBox('0x12345', 'web3prov', boxOpts)
     expect(mockedUtils.openBoxConsent).toHaveBeenCalledTimes(0)
     expect(mockedUtils.httpRequest).toHaveBeenCalledTimes(1)
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress/did:muport:Qmsdfp98yw4t7', 'GET')
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress/did:muport:Qmsdfp98yw4t7', 'GET')
     expect(box.profileStore._sync).toHaveBeenCalledTimes(1)
     expect(box.profileStore._sync).toHaveBeenCalledWith('/orbitdb/Qmasdf/08a7.public')
     expect(box.privateStore._sync).toHaveBeenCalledTimes(1)
@@ -174,7 +174,7 @@ describe('3Box', () => {
     box = await ThreeBox.openBox('0x12345', 'web3prov', boxOpts2)
     expect(mockedUtils.openBoxConsent).toHaveBeenCalledTimes(0)
     expect(mockedUtils.httpRequest).toHaveBeenCalledTimes(1)
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress/did:muport:Qmsdfp98yw4t7', 'GET')
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress/did:muport:Qmsdfp98yw4t7', 'GET')
     expect(box.profileStore._sync).toHaveBeenCalledTimes(1)
     expect(box.profileStore._sync).toHaveBeenCalledWith('/orbitdb/Qmasdf/08a7.public')
     expect(box.privateStore._sync).toHaveBeenCalledTimes(1)
@@ -207,8 +207,8 @@ describe('3Box', () => {
     expect(mockedUtils.openBoxConsent).toHaveBeenCalledTimes(1)
     expect(mockedUtils.openBoxConsent).toHaveBeenCalledWith(addr, prov)
     expect(mockedUtils.httpRequest).toHaveBeenCalledTimes(2)
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress/did:muport:Qmsdsdf87g329', 'GET')
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress', 'POST', {
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress/did:muport:Qmsdsdf87g329', 'GET')
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress', 'POST', {
       hash_token: 'veryJWT,/orbitdb/QmTshhMpnDxHRgBuMKxsQfEMfcQnoCE5EromHfH1V9JZr6/ab8c73d8f.root,did:muport:Qmsdsdf87g329'
     })
     expect(box2.profileStore._sync).toHaveBeenCalledTimes(1)
@@ -235,7 +235,7 @@ describe('3Box', () => {
       image: 'an awesome selfie'
     })
     expect(mockedUtils.httpRequest).toHaveBeenCalledTimes(1)
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress/0x12345', 'GET')
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress/0x12345', 'GET')
   })
 
   it('should clear cache correctly', async () => {
@@ -255,7 +255,7 @@ describe('3Box', () => {
       image: 'an awesome selfie'
     })
     expect(mockedUtils.httpRequest).toHaveBeenCalledTimes(1)
-    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/odbAddress/0x12345', 'GET')
+    expect(mockedUtils.httpRequest).toHaveBeenCalledWith('address-server/rootStoreAddress/0x12345', 'GET')
   })
 
   afterAll(async () => {

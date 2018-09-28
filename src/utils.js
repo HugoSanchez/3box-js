@@ -49,6 +49,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const request = new XMLHttpRequest()
       request.onreadystatechange = () => {
+        console.log(request)
         if (request.readyState === 4 && request.timeout !== 1) {
           if (request.status !== 200) {
             reject(request.responseText)
